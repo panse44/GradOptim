@@ -1,5 +1,6 @@
-Package: desc
-Title: Manipulate DESCRIPTION Files
+Package: GradOptim
+Type: Package
+Title: A Generalized R package
 Version: 1.0
 Authors@R: c(
     person("Ankit", "Panse",, "ankitpanse44@gmail.com", role = c("aut", "cre")),
@@ -15,5 +16,4 @@ Depends:
     R (>= 3.1.0)
 Encoding: UTF-8
 RoxygenNote: 6.0.1.9000
-Collate: 
-'Predict.R'
+
