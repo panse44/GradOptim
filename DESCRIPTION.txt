@@ -1,0 +1,2 @@
+URL: http://github.com/panse44/GradOptim
+BugReports: http://github.com/panse44/GradOptim/issues
