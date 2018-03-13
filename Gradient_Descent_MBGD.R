@@ -1,0 +1,113 @@
+# A function to build a linear regression model on the given training data by 
+# estimating the coefficients using the Mini Batch Gradient Descent Optimization technique.
+
+Gradient_Descent_MBGD <- function(train.Y=NULL, train.X=NULL, alpha = 0.001, tolerance = 0.01,plot=FALSE,SE_estimates=FALSE,n_Iter=10,batch_size=10)
+{
+
+# Check if all the required arguments has been passed or not  
+  if(is.null(train.Y))
+  {
+    
+    #warning("Response Variable cannot be Null")
+    stop("Response Variable cannot be Null")
+  }
+  
+  if(is.null(train.X))
+  {
+    
+    warning("Predictor Variable cannot be Null")
+    stop()
+    
+  }
+
+# Dividing the data into part of equal sizes    
+  N=nrow(train.X)
+  temp=N%%batch_size
+  train.X=train.X[1:(N-temp),]
+  train.Y=train.Y[1:(N-temp)]
+
+# Use the Input Slpit function to convert the Categorical and Numerical Variables    
+  train.X=input.split(df=train.X)
+  
+# Call the MBGD_Linear_Boot function if the corresponding argument passed is set as TRUE   
+  SE=0
+  if(SE_estimates)
+  {
+    SE=MBGD_Linear_boot(train.Y,train.X,alpha,tolerance)
+    
+  }
+ 
+# Add an extra column of 1's to the existing dataset     
+  train.X = cbind(1,train.X)
+
+# Number of coefficients to be estimated     
+  nweights = ncol(train.X)
+  
+# Initializing the loop variables   
+  count = 0
+  delta = 1
+  N=nrow(train.X)
+  weight = matrix(rep(0,nweights),nrow=nweights)
+  
+# A FOR loop for the number of outer iteration to be done  
+  for( i in 1:n_Iter )
+  {  
+     
+# An inner FOR loop for estimating the coefficients     
+    for( i in seq(1,N,batch_size))
+      {
+        temp= t(train.X)[,i:i-1+batch_size]%*%(train.Y[i:i-1+batch_size] - train.X[i:i-1+batch_size,]%*%weight)
+        weight = weight + (alpha * temp)
+      }
+  }
+  
+  rownames(weight)=c(colnames(train.X))
+
+# Calculating the various metrics of the model using the estimated coefficients   
+  predict_values=weight[1]+train.X[,-1]%*%weight[-1]
+  residual=train.Y-predict_values
+  SSE=sum(residual^2)
+  SST=sum((train.Y-mean(train.Y))^2)
+  N=nrow(train.X)
+  P=ncol(train.X)-1
+  RSE=sqrt(SSE/(N-P-1))
+  R_sq=1-(SSE/SST)
+  R_sq_Adj=R_sq-((P-1)/(N-P))*(1-R_sq)
+  AIC=N+N*log10(2*pi)+N*log10(SSE/N)+2*(P+2)
+  BIC=N+N*log10(2*pi)+N*log10(SSE/N)+log10(N)*(P+2)
+  
+# If the plot variables is set as TRUE then plot the corresponding residual plots    
+  if(plot==TRUE)
+  {
+    readline("Residual Error Graphs:Press Enter to continue plotting with the graph")
+    plot(predict_values,scale(residual),main = "Standardized Residual Vs Fitted Value",xlab = "Fitted Value",ylab = "Standardized Residuals")
+    readline("Residual Error Graphs:Press Enter to continue plotting with the graph")
+    qqnorm(scale(residual),main = "Normal Q-Q plot of Residuals")
+    
+  }
+  
+# Combines all the resutls in a list object which will be the output of the function    
+  
+  object=list(Coefficients=weight,Residuals=residual,Residuals_Summary=summary(residual),Fitted_Values=predict_values,Residual_Std_Error=RSE,
+              R_Square=R_sq,R_square_Adjst=R_sq_Adj,AIC=AIC,BIC=BIC,Standard_Error= cbind(weight,SE))
+  
+return(object)
+  
+}
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
